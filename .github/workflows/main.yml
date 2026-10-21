@@ -18,15 +18,26 @@ jobs:
           sudo apt-get install -y git zip unzip openjdk-17-jdk python3-pip autoconf libtool pkg-config zlib1g-dev libncurses5-dev libgdbm-dev libnss3-dev libssl-dev libreadline-dev libffi-dev libsqlite3-dev tk-dev libgdbm-compat-dev libmpdec-dev
           pip install --user --upgrade buildozer cython
 
+      - name: Pre-install Android SDK Tools (Fix sdkmanager missing)
+        run: |
+          # Создаем структуру папок, которую ожидает Buildozer
+          mkdir -p ~/.buildozer/android/platform/android-sdk/cmdline-tools/latest
+          
+          # Скачиваем официальные commandlinetools от Google, где ЕСТЬ sdkmanager
+          wget https://google.com -O tools.zip
+          unzip -q tools.zip
+          
+          # Переносим файлы в нужную для Buildozer папку
+          mv cmdline-tools/* ~/.buildozer/android/platform/android-sdk/cmdline-tools/latest/
+          
+          # Принимаем лицензии
+          mkdir -p ~/.buildozer/android/platform/android-sdk/licenses
+          echo -e "\n24333f8a63b6825ea9c5514f83c2829b004d1fee\n8933bad161af4178b1185d1a37fbf41ea5269c55\nd56f5187479451eabf01fb74bf36700489da11f2" > ~/.buildozer/android/platform/android-sdk/licenses/android-sdk-license
+
       - name: Build with Buildozer
         run: |
           export PATH=$PATH:~/.local/bin
           export BUILDOZER_ALLOW_ORG_TEST_DOMAIN=1
-          
-          # Принудительно создаем нужную папку и принимаем все лицензии Android SDK
-          mkdir -p ~/.buildozer/android/platform/android-sdk/licenses
-          echo -e "\n8933bad161af4178b1185d1a37fbf41ea5269c55\nd56f5187479451eabf01fb74bf36700489da11f2\n24333f8a63b6825ea9c5514f83c2829b004d1fee" > ~/.buildozer/android/platform/android-sdk/licenses/android-sdk-license
-          
           buildozer android debug
 
       - name: Upload APK Artifact
