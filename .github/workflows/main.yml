@@ -18,14 +18,15 @@ jobs:
           sudo apt-get install -y git zip unzip openjdk-17-jdk python3-pip autoconf libtool pkg-config zlib1g-dev libncurses5-dev libgdbm-dev libnss3-dev libssl-dev libreadline-dev libffi-dev libsqlite3-dev tk-dev libgdbm-compat-dev libmpdec-dev
           pip install --user --upgrade buildozer cython
 
-      - name: Auto-accept Android SDK License
-        run: |
-          sed -i 's/# android.accept_sdk_license = False/android.accept_sdk_license = True/' buildozer.spec
-
       - name: Build with Buildozer
         run: |
           export PATH=$PATH:~/.local/bin
           export BUILDOZER_ALLOW_ORG_TEST_DOMAIN=1
+          
+          # Принудительно создаем нужную папку и принимаем все лицензии Android SDK
+          mkdir -p ~/.buildozer/android/platform/android-sdk/licenses
+          echo -e "\n8933bad161af4178b1185d1a37fbf41ea5269c55\nd56f5187479451eabf01fb74bf36700489da11f2\n24333f8a63b6825ea9c5514f83c2829b004d1fee" > ~/.buildozer/android/platform/android-sdk/licenses/android-sdk-license
+          
           buildozer android debug
 
       - name: Upload APK Artifact
