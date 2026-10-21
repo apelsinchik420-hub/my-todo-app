@@ -3,7 +3,7 @@ on: [push, workflow_dispatch]
 
 jobs:
   build:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     steps:
       - uses: actions/checkout@v4
 
@@ -12,13 +12,27 @@ jobs:
         with:
           python-version: '3.11'
 
-      - name: Install Buildozer and Dependencies
+      - name: Install System Dependencies
         run: |
           sudo apt-get update
           sudo apt-get install -y git zip unzip openjdk-17-jdk python3-pip autoconf libtool pkg-config zlib1g-dev libncurses5-dev libgdbm-dev libnss3-dev libssl-dev libreadline-dev libffi-dev libsqlite3-dev tk-dev libgdbm-compat-dev libreproproc-dev libmpdec-dev
           pip install --user --upgrade buildozer cython
 
+      - name: Auto-accept Android SDK License
+        run: |
+          # Этот шаг автоматически включает согласие с лицензией внутри вашего конфига
+          sed -i 's/# android.accept_sdk_license = False/android.accept_sdk_license = True/' buildozer.spec
+
       - name: Build with Buildozer
         run: |
           export PATH=$PATH:~/.local/bin
+          # Переменная позволяет обойти ограничения на тестовые домены в новых версиях
+          export BUILDOZER_ALLOW_ORG_TEST_DOMAIN=1
           buildozer android debug
+
+      - name: Upload APK Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: my-todo-app-apk
+          path: bin/*.apk
+
