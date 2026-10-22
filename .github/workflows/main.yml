@@ -28,8 +28,8 @@ jobs:
           mkdir -p ~/.buildozer/android/platform/android-sdk/licenses
           echo -e "\n8933bad161af4178b1185d1a37fbf41ea5269c55\nd56f5187479451eabf01fb74bf36700489da11f2\n24333f8a63b6825ea9c5514f83c2829b004d1fee\n8498132de561f5ec461a3d14d9a1b9fd0dc81c7c" > ~/.buildozer/android/platform/android-sdk/licenses/android-sdk-license
           
-          # Запускаем в тихом режиме сборки, чтобы логи не переполнялись
-          buildozer -v android debug
+          # Запускаем обычную сборку, перенаправляя тонны предупреждений Cython в "тихий" режим
+          buildozer android debug > buildozer_output.log 2>&1 || (tail -n 100 buildozer_output.log && exit 1)
 
       - name: Upload APK Artifact
         if: always()
