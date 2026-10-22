@@ -28,10 +28,10 @@ jobs:
           mkdir -p ~/.buildozer/android/platform/android-sdk/licenses
           echo -e "\n8933bad161af4178b1185d1a37fbf41ea5269c55\nd56f5187479451eabf01fb74bf36700489da11f2\n24333f8a63b6825ea9c5514f83c2829b004d1fee\n8498132de561f5ec461a3d14d9a1b9fd0dc81c7c" > ~/.buildozer/android/platform/android-sdk/licenses/android-sdk-license
           
-          buildozer android debug
+          # Запускаем в тихом режиме сборки, чтобы логи не переполнялись
+          buildozer -v android debug
 
       - name: Upload APK Artifact
-        # Эта строчка заставит выгрузить файл, даже если GitHub обрезал логи сборки
         if: always()
         uses: actions/upload-artifact@v4
         with:
